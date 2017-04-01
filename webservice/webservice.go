@@ -2,7 +2,7 @@ package webservice
 
 import (
 	"encoding/xml"
-	"github.com/YoungZhou93/weather/weather"
+	"github.com/YoungChou93/weather/weather"
 	"io/ioutil"
 	"net/http"
 	"strings"

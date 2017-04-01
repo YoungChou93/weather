@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/YoungZhou93/weather/database"
+	"github.com/YoungChou93/weather/database"
 	"fmt"
 	"net/http"
 	"log"
-	"github.com/YoungZhou93/weather/webservice"
+	"github.com/YoungChou93/weather/webservice"
 	"time"
-	"github.com/YoungZhou93/weather/weather"
+	"github.com/YoungChou93/weather/weather"
 	"html/template"
 	"os"
 )

@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/YoungZhou93/weather/weather"
+	"github.com/YoungChou93/weather/weather"
 	_ "github.com/go-sql-driver/mysql"
 	"os"
 	"errors"
