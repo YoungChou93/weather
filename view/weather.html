@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript"
+            src="/static/bootstrap/js/jquery-2.2.1.min.js"></script>
+    <link rel="stylesheet"
+          href="/static/bootstrap/css/bootstrap.min.css">
+    <script type="text/javascript"
+            src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <title>天气</title>
+</head>
+<style type="text/css">
+    html,body{
+        background-color: #ececec;
+    }
+    h1 {
+        font-size: 110px;
+        font-family: 微软雅黑;
+        letter-spacing: 10px;
+    }
+    p{
+        font-family: 微软雅黑;
+        font-size: 18px;
+        letter-spacing: 5px;
+        margin-top:10px;
+        margin-bottom:10px;
+    }
+</style>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 col-xs-3">
+        </div>
+        <div class="col-md-6 col-xs-6 text-center">
+            <h1>{{.City}}</h1>
+            <p>{{.Date}} {{.Situation}} {{.Temperature}}</p>
+            <img src="/static/img/a_{{.Icon1}}" alt="图标"/>
+            <label style="font-family: 微软雅黑;font-size: 30px;">~</label>
+            <img src="/static/img/a_{{.Icon2}}" alt="图标"/>
+            <p style="font-family: 微软雅黑;font-size: 15px;">{{.Descript}}</p>
+            <p style="font-family: 微软雅黑;font-size: 10px;margin-top:50px;">{{.Advice}}</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
