@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript"
+            src="/static/bootstrap/js/jquery-2.2.1.min.js"></script>
+    <link rel="stylesheet"
+          href="/static/bootstrap/css/bootstrap.min.css">
+    <script type="text/javascript"
+            src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <title>天气</title>
+</head>
+<style type="text/css">
+    html,body{
+        background-color: #ececec;
+    }
+    h1 {
+        font-size: 110px;
+        font-family: 微软雅黑;
+        letter-spacing: 10px;
+    }
+    h2 {
+        font-size: 50px;
+        font-family: 微软雅黑;
+        letter-spacing: 10px;
+    }
+    p{
+        font-family: 微软雅黑;
+        font-size: 18px;
+        letter-spacing: 5px;
+        margin-top:10px;
+        margin-bottom:10px;
+    }
+</style>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 col-xs-1">
+        </div>
+        <div class="col-md-6 col-xs-10 text-center">
+            <h1>{{.Cityname}}</h1>
+            <h2>{{.Currenttemp}}℃ {{.Currentweather}} {{.Time}}</h2>
+            <p>AQI:{{.Aqipm25}}</p>
+
+
+            <p>{{.Temp}}/{{.Tempn}}</p>
+            <p>{{.Weather}}</p>
+            <p>{{.Wd}} {{.Ws}}</p>
+            <p>{{.Date}}  </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
