@@ -73,16 +73,18 @@ func getWeatherFromWeb(url string)(string,error){
 }
 //获取天气装入strurct
 func GetWeather(citycode string)(weather.WeatherDetail,error){
+	var weatherNew weather.WeatherDetail
+
 	url :="http://d1.weather.com.cn/sk_2d/"+citycode+".html"
 	jsonString,err:=getWeatherFromWeb(url)
 	if err != nil {
-             return weather.NewNullWeatherDetail(),err
+             return weatherNew,err
 	}
 	str:=strings.Split(jsonString,"= ")
 	jsonString=str[1]
 	json, err:= jason.NewObjectFromBytes([]byte(jsonString))
 	if err != nil {
-		return weather.NewNullWeatherDetail(),err
+		return weatherNew,err
 	}
 	cityname,_:=json.GetString("cityname")
 	city,_:=json.GetString("city")
@@ -102,20 +104,20 @@ func GetWeather(citycode string)(weather.WeatherDetail,error){
 	url = "http://d1.weather.com.cn/dingzhi/"+citycode+".html"
 	jsonString,err=getWeatherFromWeb(url)
 	if err != nil {
-		return weather.NewNullWeatherDetail(),err
+		return weatherNew,err
 	}
 	str=strings.Split(jsonString,";var")
 	str=strings.Split(str[0]," =")
 	jsonString=str[1]
 	json, err = jason.NewObjectFromBytes([]byte(jsonString))
 	if err != nil {
-		return weather.NewNullWeatherDetail(),err
+		return weatherNew,err
 	}
 	temp,_:=json.GetString("weatherinfo","temp")
 	tempn,_:=json.GetString("weatherinfo","tempn")
 	weatherday,_:=json.GetString("weatherinfo","weather")
 	wd,_:=json.GetString("weatherinfo","wd")
 	ws,_:=json.GetString("weatherinfo","ws")
-
-	return weather.NewWeatherDetail(cityname, city, currenttemp, currentweather, currentwd, currentwde, currentws, aqi, aqipm25, timenow, date, temp, tempn, weatherday, wd, ws),nil
+	weatherNew=weather.NewWeatherDetail(cityname, city, currenttemp, currentweather, currentwd, currentwde, currentws, aqi, aqipm25, timenow, date, temp, tempn, weatherday, wd, ws)
+	return weatherNew,nil
 }

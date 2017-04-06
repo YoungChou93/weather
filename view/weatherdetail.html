@@ -40,11 +40,9 @@
         <div class="col-md-6 col-xs-10 text-center">
             <h1>{{.Cityname}}</h1>
             <h2>{{.Currenttemp}}℃ {{.Currentweather}} {{.Time}}</h2>
+            <img src="/static/img/{{.Image}}" alt="图标"/>
             <p>AQI:{{.Aqipm25}}</p>
-
-
-            <p>{{.Temp}}/{{.Tempn}}</p>
-            <p>{{.Weather}}</p>
+            <p>{{.Temp}}/{{.Tempn}} {{.Weather}}</p>
             <p>{{.Wd}} {{.Ws}}</p>
             <p>{{.Date}}  </p>
         </div>

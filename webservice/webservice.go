@@ -55,23 +55,39 @@ xml格式
 */
 func xmlToWeather(xmlbody []byte) (weather.Weather, error) {
 	w := WeatherXML{}
+	var weatherNew weather.Weather
 	err := xml.Unmarshal(xmlbody, &w)
 	if err != nil {
-		return weather.NewNullWeather(), err
+		return weatherNew, err
 	}
 	str:=strings.Split(w.Strs[6]," ")
-	weather := weather.NewWeather(w.Strs[0], w.Strs[1], w.Strs[4], w.Strs[5], str[0], str[1],w.Strs[7], w.Strs[8], w.Strs[9], w.Strs[10], w.Strs[11],)
-	return weather, nil
+	weatherNew = weather.NewWeather(
+		w.Strs[0],
+		w.Strs[1],
+		w.Strs[4],
+		w.Strs[5],
+		str[0],
+		str[1],
+		w.Strs[7],
+		w.Strs[8],
+		w.Strs[9],
+		w.Strs[10],
+		w.Strs[11],)
+	return weatherNew, nil
 }
 
 func GetWeather(city string) (weather.Weather, error) {
+	var (
+		todayWeather weather.Weather
+		err error
+	)
 	res, err := getWeatherFromWebService(city)
 	if err != nil {
-		return weather.NewNullWeather(), err
+		return todayWeather, err
 	}
-	todayWeather, err := xmlToWeather(res)
+	todayWeather, err = xmlToWeather(res)
 	if err != nil {
-		return weather.NewNullWeather(), err
+		return todayWeather, err
 	}
 	return todayWeather, nil
 }

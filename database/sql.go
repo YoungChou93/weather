@@ -2,19 +2,17 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/YoungChou93/weather/weather"
 	_ "github.com/go-sql-driver/mysql"
-	"os"
 	"errors"
 	"bytes"
 )
 
 var db *sql.DB
 
-func Connect(user string, password string, database string) error{
+func Connect(user , password , url, database string) error{
 	var err error
-	db, err = sql.Open("mysql", user+":"+password+"@tcp(localhost:3306)/"+database+"?charset=utf8")
+	db, err = sql.Open("mysql", user+":"+password+"@tcp("+url+")/"+database+"?charset=utf8")
 	db.SetMaxOpenConns(2000)
 	db.SetMaxIdleConns(1000)
 	db.Ping()
@@ -57,14 +55,20 @@ func QueryCodeByCity(cityname string)(string,error){
 
 
 //插入一条数据
-func Insert(weather weather.Weather) int64 {
+func Insert(weather weather.Weather) (int64,error) {
 	stmt, err := db.Prepare(`INSERT weather (province,city, datetime, temperature, date, situation, wind, icon1, icon2, descript, advice) values (?,?,?,?,?,?,?,?,?,?,?)`)
-	checkError(err)
+	if err!=nil {
+		return -1,err
+	}
 	res, err := stmt.Exec(weather.Province, weather.City, weather.Datetime, weather.Temperature, weather.Date, weather.Situation, weather.Wind, weather.Icon1, weather.Icon2, weather.Descript, weather.Advice)
-	checkError(err)
+	if err!=nil {
+		return -1,err
+	}
 	num, err := res.RowsAffected()
-	checkError(err)
-	return num
+	if err!=nil {
+		return -1,err
+	}
+	return num,nil
 }
 //查询最新一条数据
 func Query(key string, value string) (weather.Weather,error) {
@@ -72,7 +76,7 @@ func Query(key string, value string) (weather.Weather,error) {
 	var weatherNew weather.Weather
 	defer rows.Close()
 	if err!=nil {
-		return weather.NewNullWeather(),err
+		return weatherNew,err
 	}
 
 	columns, _ := rows.Columns()
@@ -102,22 +106,19 @@ func Query(key string, value string) (weather.Weather,error) {
 			record[columns[10]],
 			record[columns[11]])
 	}else{
-		return weather.NewNullWeather(),errors.New("error")
+		return weatherNew,errors.New("error")
 	}
 	return weatherNew,nil
 }
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Println("Error is ", err)
-		os.Exit(-1)
-	}
-}
 
 
-func InsertWeatherDetail(weather weather.WeatherDetail,table string) int64 {
+
+func InsertWeatherDetail(weather weather.WeatherDetail,table string) (int64,error){
 	stmt, err := db.Prepare(`INSERT `+ table +` (cityname, city, currenttemp, currentweather, currentwd, currentwde, currentws, aqi, aqipm25, time, date, temp, tempn, weather, wd, ws) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-	checkError(err)
+	if err!=nil {
+		return -1,err
+	}
 	res, err := stmt.Exec(
 		weather.Cityname,
 		weather.City,
@@ -135,10 +136,14 @@ func InsertWeatherDetail(weather weather.WeatherDetail,table string) int64 {
 		weather.Weather,
 		weather.Wd,
 		weather.Ws)
-	checkError(err)
+	if err!=nil {
+		return -1,err
+	}
 	num, err := res.RowsAffected()
-	checkError(err)
-	return num
+	if err!=nil {
+		return -1,err
+	}
+	return num,nil
 }
 
 func QueryNewestWeatherDetail(table string)(weather.WeatherDetail,error) {
@@ -146,7 +151,7 @@ func QueryNewestWeatherDetail(table string)(weather.WeatherDetail,error) {
 	var weatherNew weather.WeatherDetail
 	defer rows.Close()
 	if err != nil {
-		return weather.NewNullWeatherDetail(), err
+		return weatherNew, err
 	}
 
 	columns, _ := rows.Columns()
@@ -181,7 +186,7 @@ func QueryNewestWeatherDetail(table string)(weather.WeatherDetail,error) {
 			record[columns[15]],
 			record[columns[16]])
 	}else{
-		return weather.NewNullWeatherDetail(), errors.New("error")
+		return weatherNew, errors.New("error")
 	}
 	return weatherNew,nil
 }
