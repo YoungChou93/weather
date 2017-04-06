@@ -47,8 +47,8 @@ func init() {
 		logger.Println("创建数据库连接失败...", err)
 	} else {
 		logger.Println("创建数据库连接成功...")
-		//saveWeather()
-		//saveWeatherDetail()
+		saveWeather()
+		saveWeatherDetail()
 		//一小时获取一次
 		ticker := time.NewTicker(time.Hour * 1)
 		go func() {
