@@ -113,43 +113,43 @@ func NewWeatherView(weather WeatherDetail)WeatherView{
 func getImage(weather string)string{
 	switch weather {
 	case "晴":
-		return "a_0.gif"
+		return "1.png"
 	case "多云":
-		return "a_1.gif"
+		return "5.png"
 	case "阴":
-		return "a_2.gif"
+		return "3.png"
 	case "阵雨":
-		return "a_3.gif "
+		return "8.png "
 	case "雷阵雨":
-		return "a_4.gif"
+		return "15.png"
 	case "雷阵雨并伴有冰雹":
-		return "a_5.gif"
+		return "16.png"
 	case "雨加雪":
-		return "a_6.gif"
+		return "14.png"
 	case "雨":
-		return "a_7.gif"
+		return "8.png"
 	case "小雨":
-		return "a_7.gif"
+		return "8.png"
 	case "中雨":
-		return "a_8.gif"
+		return "9.png"
 	case "大雨":
-		return "a_9.gif"
+		return "10.png"
 	case "暴雨":
-		return "a_10.gif"
+		return "11.png"
 	case "大暴雨":
-		return "a_11.gif"
+		return "12.png"
 	case "特大暴雨":
-		return "a_12.gif"
+		return "13.png"
 	case "阵雪":
 		return "a_13.gif"
 	case "小雪":
-		return "a_14.gif"
+		return "17.png"
 	case "中雪":
-		return "a_15.gif"
+		return "18.png"
 	case "大雪":
-		return "a_16.gif"
+		return "19.png"
 	case "暴雪":
-		return "a_17.gif"
+		return "20.png"
 	case "雾":
 		return "a_18.gif"
 	case "冻雨":
