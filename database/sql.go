@@ -57,6 +57,7 @@ func QueryCodeByCity(cityname string)(string,error){
 //插入一条数据
 func Insert(weather weather.Weather) (int64,error) {
 	stmt, err := db.Prepare(`INSERT weather (province,city, datetime, temperature, date, situation, wind, icon1, icon2, descript, advice) values (?,?,?,?,?,?,?,?,?,?,?)`)
+	defer stmt.Close()
 	if err!=nil {
 		return -1,err
 	}
@@ -116,6 +117,7 @@ func Query(key string, value string) (weather.Weather,error) {
 
 func InsertWeatherDetail(weather weather.WeatherDetail,table string) (int64,error){
 	stmt, err := db.Prepare(`INSERT `+ table +` (cityname, city, currenttemp, currentweather, currentwd, currentwde, currentws, aqi, aqipm25, time, date, temp, tempn, weather, wd, ws) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+	defer stmt.Close()
 	if err!=nil {
 		return -1,err
 	}
