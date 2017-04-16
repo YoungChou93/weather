@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"errors"
 )
 
 /**
@@ -59,6 +60,9 @@ func xmlToWeather(xmlbody []byte) (weather.Weather, error) {
 	err := xml.Unmarshal(xmlbody, &w)
 	if err != nil {
 		return weatherNew, err
+	}
+	if(strings.Contains(w.Strs[0],"限制")){
+		return weatherNew, errors.New("已到达访问限制")
 	}
 	str:=strings.Split(w.Strs[6]," ")
 	weatherNew = weather.NewWeather(
