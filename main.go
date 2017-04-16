@@ -22,7 +22,7 @@ var logger *log.Logger
 func startHttpServer() {
 	http.HandleFunc("/wuhan", getWeather)
 	http.HandleFunc("/", getWeatherDetail)
-	http.HandleFunc("/getJson", getWeatherDetailJson)
+	http.HandleFunc("/jsonp", getWeatherDetailJson)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	err := http.ListenAndServe(config.Get(config.PORT), nil)
 	if err != nil {
@@ -158,11 +158,13 @@ func getWeatherDetailJson(w http.ResponseWriter, r *http.Request) {
 		logger.Println("Error is ", err)
 		w.Write([]byte("城市名称有误或不支持该城市"))
 	} else {
-		weather, err := database.QueryNewestWeatherDetail("t" + code)
+		weatherday, err := database.QueryNewestWeatherDetail("t" + code)
 		checkError(err, w)
-		bytes, err := json.Marshal(weather)
+		weatherview := weather.NewWeatherView(weatherday)
+		bytes, err := json.Marshal(weatherview)
 		checkError(err, w)
-		w.Write(bytes)
+		result:="callback("+string(bytes)+")"
+		w.Write([]byte(result))
 	}
 
 }

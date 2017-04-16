@@ -29,8 +29,8 @@ A small program about the weather<br>
 
 * /wuhan <br>
 获取武汉天气，因为使用的是webservice，怕有访问次数限制，所以只提供了一个城市
-* /getJson<br>
-获取当天实时天气信息,返回Json格式数据，可以使用参数cityname，例如/getJson?cityname=北京
+* /jsonp<br>
+获取当天实时天气信息,返回json格式数据，可以使用参数cityname，例如/jsonp?cityname=北京(方便跨域调用)
 * /<br>
 获取当天实时天气信息,返回html,同样可以使用参数cityname
 
