@@ -5,18 +5,16 @@ import (
 	"fmt"
 	"github.com/YoungChou93/weather/config"
 	"github.com/YoungChou93/weather/database"
-	"github.com/YoungChou93/weather/log"
 	"github.com/YoungChou93/weather/weather"
 	"github.com/YoungChou93/weather/web"
 	"github.com/YoungChou93/weather/webservice"
 	"html/template"
-	"log"
 	"net/http"
 	"strings"
 	"time"
+	"github.com/YoungChou93/weather/log"
 )
 
-var logger *log.Logger
 
 //启动web服务
 func startHttpServer() {
@@ -26,7 +24,7 @@ func startHttpServer() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	err := http.ListenAndServe(config.Get(config.PORT), nil)
 	if err != nil {
-		logger.Println("Error is ", err)
+		log8j.Logger.Error("Error is "+ err.Error())
 	}
 
 }
@@ -34,21 +32,20 @@ func init() {
 	//加载配置文件
 	config.LoadConfig()
 	//初始化日志
-	weatherlog.LogInit()
-	logger = weatherlog.GetLog()
-	logger.Println("程序启动...")
-	logger.Println("创建数据库连接...")
+	log8j.Logger.Init(config.Get(config.LOGFILE),"weather")
+	log8j.Logger.Info("程序启动...")
+	log8j.Logger.Info("创建数据库连接...")
 	err := database.Connect(
 		config.Get(config.USERNAME),
 		config.Get(config.PASSWORD),
 		config.Get(config.URL),
 		config.Get(config.DATABASE))
 	if err != nil {
-		logger.Println("创建数据库连接失败...", err)
+		log8j.Logger.Error("创建数据库连接失败..."+ err.Error())
 	} else {
-		logger.Println("创建数据库连接成功...")
+		log8j.Logger.Info("创建数据库连接成功...")
 		saveWeather()
-		//saveWeatherDetail()
+		saveWeatherDetail()
 		//一小时获取一次
 		ticker := time.NewTicker(time.Hour * 1)
 		go func() {
@@ -62,7 +59,7 @@ func init() {
 
 //保存天气信息
 func saveWeather() {
-	logger.Println("获取天气信息，weather")
+	log8j.Logger.Info("获取武汉天气信息，从wenservice获取")
 	var (
 		weather weather.Weather
 		err     error
@@ -73,21 +70,21 @@ func saveWeather() {
 	for i := 3; i > 0; i-- {
 		weather, err = webservice.GetWeather("武汉")
 		if err != nil {
-			logger.Println("获取天气信息失败...", err)
+			log8j.Logger.Error("获取天气信息失败..."+ err.Error())
 			continue
 		}
 		num, err := database.Insert(weather)
 		if num < 0 || err != nil {
-			logger.Println("获取天气信息成功，数据写入数据库失败...", err)
+			log8j.Logger.Error("获取天气信息成功，数据写入数据库失败..."+ err.Error())
 			continue
 		}
-		logger.Println(weather.Date + " " + weather.City + " " + weather.Situation)
+		log8j.Logger.Info(weather.Date + " " + weather.City + " " + weather.Situation)
 		break
 	}
 }
 
 func saveWeatherDetail() {
-	logger.Println("获取天气信息，weatherdetail")
+	log8j.Logger.Info("从web抓取天气信息")
 	result, _ := database.QueryCode()
 	codes := strings.Split(result, "#")
 	for i := 0; i < len(codes); i++ {
@@ -95,12 +92,12 @@ func saveWeatherDetail() {
 			for j := 3; j > 0; j-- {
 				weather, err := web.GetWeather(codes[i])
 				if err != nil {
-					logger.Println("Error is ", err)
+					log8j.Logger.Error(err.Error())
 					continue
 				}
 				num, err := database.InsertWeatherDetail(weather, "t"+codes[i])
 				if num < 0 || err != nil {
-					logger.Println("Error is ", err)
+					log8j.Logger.Error(err.Error())
 					continue
 				}
 				fmt.Println("t" + codes[i])
@@ -112,10 +109,10 @@ func saveWeatherDetail() {
 	}
 }
 
-//获取天气信息
+//获取武汉天气信息
 func getWeather(w http.ResponseWriter, r *http.Request) {
 
-	logger.Println(r.RemoteAddr + " 获取天气信息")
+	log8j.Logger.Info(r.RemoteAddr + " 获取武汉天气信息")
 	weather, err := database.Query("city", "武汉")
 	checkError(err, w)
 	t, err := template.ParseFiles("view/weather.html")
@@ -124,16 +121,16 @@ func getWeather(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//根据城市获取天气信息html
 func getWeatherDetail(w http.ResponseWriter, r *http.Request) {
-
-	logger.Println(r.RemoteAddr + " 获取天气信息")
 	cityname := r.FormValue("cityname")
 	if len(cityname) <= 0 {
 		cityname = "武汉"
 	}
+	log8j.Logger.Info(r.RemoteAddr + " 获取"+cityname+"天气信息")
 	code, err := database.QueryCodeByCity(cityname)
 	if err != nil {
-		logger.Println("Error is ", err)
+		log8j.Logger.Error(err.Error())
 		w.Write([]byte("城市名称有误或不支持该城市"))
 	} else {
 		weatherday, err := database.QueryNewestWeatherDetail("t" + code)
@@ -146,16 +143,17 @@ func getWeatherDetail(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//根据城市获取天气信息jsop
 func getWeatherDetailJson(w http.ResponseWriter, r *http.Request) {
 
 	cityname := r.FormValue("cityname")
 	if len(cityname) <= 0 {
 		cityname = "武汉"
 	}
-	logger.Println(r.RemoteAddr + " 获取天气信息:" + cityname)
+	log8j.Logger.Info(r.RemoteAddr + " 获取天气信息:" + cityname)
 	code, err := database.QueryCodeByCity(cityname)
 	if err != nil {
-		logger.Println("Error is ", err)
+		log8j.Logger.Error(err.Error())
 		w.Write([]byte("城市名称有误或不支持该城市"))
 	} else {
 		weatherday, err := database.QueryNewestWeatherDetail("t" + code)
@@ -171,7 +169,7 @@ func getWeatherDetailJson(w http.ResponseWriter, r *http.Request) {
 
 func checkError(err error, w http.ResponseWriter) {
 	if err != nil {
-		logger.Println("Error is ", err)
+		log8j.Logger.Error(err.Error())
 		w.Write([]byte("出现错误"))
 	}
 
@@ -179,5 +177,4 @@ func checkError(err error, w http.ResponseWriter) {
 
 func main() {
 	startHttpServer()
-
 }

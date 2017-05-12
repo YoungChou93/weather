@@ -61,7 +61,7 @@ func xmlToWeather(xmlbody []byte) (weather.Weather, error) {
 	if err != nil {
 		return weatherNew, err
 	}
-	if(strings.Contains(w.Strs[0],"限制")){
+	if(strings.Contains(w.Strs[0],"限制") || strings.Contains(w.Strs[0],"维护")){
 		return weatherNew, errors.New("已到达访问限制")
 	}
 	str:=strings.Split(w.Strs[6]," ")
