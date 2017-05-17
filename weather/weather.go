@@ -41,6 +41,10 @@ func NewWeather(
 		advice}
 }
 
+func NewNULLWeather() Weather{
+	return Weather{}
+}
+
 type WeatherDetail struct {
 	Cityname       string //城市名称
 	City           string //城市代码

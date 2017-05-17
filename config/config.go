@@ -17,6 +17,7 @@ const(
 	DATABASE="database"    //数据库名称
 	LOGFILE="logfile"      //日志文件存放位置
 	PORT="port"            //服务启动端口
+	STATICURL="staticurl"  //静态资源地址
 )
 
 
