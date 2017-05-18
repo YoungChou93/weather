@@ -7,6 +7,7 @@ import (
 	"strings"
 	"github.com/YoungChou93/weather/weather"
 	"time"
+	"errors"
 )
 
 /*
@@ -81,6 +82,9 @@ func GetWeather(citycode string)(weather.WeatherDetail,error){
              return weatherNew,err
 	}
 	str:=strings.Split(jsonString,"= ")
+	if len(str)<2{
+		return weatherNew,errors.New("字符串数组长度错误")
+	}
 	jsonString=str[1]
 	json, err:= jason.NewObjectFromBytes([]byte(jsonString))
 	if err != nil {
@@ -108,6 +112,9 @@ func GetWeather(citycode string)(weather.WeatherDetail,error){
 	}
 	str=strings.Split(jsonString,";var")
 	str=strings.Split(str[0]," =")
+	if len(str)<2{
+		return weatherNew,errors.New("字符串数组长度错误")
+	}
 	jsonString=str[1]
 	json, err = jason.NewObjectFromBytes([]byte(jsonString))
 	if err != nil {

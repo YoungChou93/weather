@@ -7,6 +7,7 @@ A small program about the weather<br>
 
 * [github.com/go-sql-driver/mysql](http://github.com/go-sql-driver/mysql) mysql包
 * [github.com/antonholmquist/jason](http://github.com/antonholmquist/jason) json包
+* [github.com/go-redis/redis](http://github.com/go-redis/redis) redis包
 
 ## 模块
 
@@ -15,7 +16,8 @@ A small program about the weather<br>
 *   database 负责存取数据（未来计划写成orm方式的）
 *   weather 存放数据的结struct
 *   config 简单读取config中的配置信息
-*   log 用于记录日志
+*   log 用于记录日志，三种级别info、warn、error,超过2MB分割文件
+*   redis 防止单个用户访问频率过高
 
 ## 流程
 

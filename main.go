@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
 )
 
 //启动web服务
@@ -45,7 +46,7 @@ func init() {
 	} else {
 		log8j.Logger.Info("创建数据库连接成功...")
 		saveWeather()
-		//saveWeatherDetail()
+		saveWeatherDetail()
 		//一小时获取一次
 		ticker := time.NewTicker(time.Hour * 1)
 		go func() {
@@ -196,4 +197,5 @@ func getIP(addr string) string {
 
 func main() {
 	startHttpServer()
+
 }
