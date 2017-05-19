@@ -11,13 +11,19 @@ import (
 var config map[string]string
 
 const(
+	/*mysql数据库*/
 	USERNAME = "username"  //数据库用户名
 	PASSWORD = "password"  //数据库密码
 	URL="url"              //数据库url
 	DATABASE="database"    //数据库名称
+	/*日志文件*/
 	LOGFILE="logfile"      //日志文件存放位置
+	/*web端口*/
 	PORT="port"            //服务启动端口
 	STATICURL="staticurl"  //静态资源地址
+	/*redis*/
+	ADDR="addr"
+	DB="db"
 )
 
 

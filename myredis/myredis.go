@@ -12,27 +12,38 @@ import (
 const (
 	FREQUENTCY_TENSECOND = 10
 	FREQUENTCY_MINUTE =20
-	FREQUENTCY_HOUE =30
+	FREQUENTCY_HOUE =50
 	NOLIMITIP = "115.159.56.151&[_"
 )
 
-var Client = createClient()
+var Client *redis.Client
 
-func createClient() *redis.Client {
+func NewRedisClient(addr,password,db string)error{
+	num,err:=strconv.Atoi(db)
+	if err!=nil{
+		return	err
+	}
+	Client,err=createClient(addr,password,num)
+	if err!=nil{
+		return	err
+	}
+	return	nil
+}
+
+func createClient(addr string,password string, db int) (*redis.Client ,error){
 	client := redis.NewClient(&redis.Options{
-		Addr:     "120.24.64.3:6379",
-		Password: "",
-		DB:       0,
+		Addr:     addr,
+		Password: password,
+		DB:       db,
 	})
 
 	// 通过 cient.Ping() 来检查是否成功连接到了 redis 服务器
 	_, err := client.Ping().Result()
 	if err!=nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		return client,err
 	}
 
-	return client
+	return client,nil
 }
 
 func IsAccess(ip string) bool{
@@ -66,4 +77,17 @@ func isItemAccess(key string,time time.Duration,frequentcy int,err error,val str
 	}
 	Client.Incr(key)
 	return true
+}
+
+
+func GetValue(key string)string{
+	value,err:=Client.Get(key).Result()
+	if err != nil {
+		return ""
+	}
+	return value
+}
+
+func PutKeyValue(key string,value interface{},t time.Duration){
+	Client.Set(key,value,t)
 }

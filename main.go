@@ -14,11 +14,15 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
 )
 
 //启动web服务
 func startHttpServer() {
+	http.HandleFunc("/weatherjson", getWeatherJson)
+	http.HandleFunc("/todayweather", getTodayWeather)
+	http.HandleFunc("/provinces", getProvince)
+	http.HandleFunc("/citys", getCity)
+
 	http.HandleFunc("/wuhan", getWeather)
 	http.HandleFunc("/", getWeatherDetail)
 	http.HandleFunc("/jsonp", getWeatherDetailJson)
@@ -36,25 +40,40 @@ func init() {
 	log8j.Logger.Init(config.Get(config.LOGFILE), "weather")
 	log8j.Logger.Info("程序启动...")
 	log8j.Logger.Info("创建数据库连接...")
-	err := database.Connect(
-		config.Get(config.USERNAME),
-		config.Get(config.PASSWORD),
-		config.Get(config.URL),
-		config.Get(config.DATABASE))
+	//连接redis
+	err:=myredis.NewRedisClient(
+		config.Get(config.ADDR),
+		"",
+	        config.Get(config.DB),
+	)
+
 	if err != nil {
-		log8j.Logger.Error("创建数据库连接失败..." + err.Error())
-	} else {
-		log8j.Logger.Info("创建数据库连接成功...")
-		saveWeather()
-		saveWeatherDetail()
-		//一小时获取一次
-		ticker := time.NewTicker(time.Hour * 1)
-		go func() {
-			for _ = range ticker.C {
-				saveWeather()
-				saveWeatherDetail()
-			}
-		}()
+		log8j.Logger.Error("创建redis连接失败..." + err.Error())
+	}else {
+		log8j.Logger.Info("创建redis连接成功...")
+
+
+		//连接mysql
+		err = database.Connect(
+			config.Get(config.USERNAME),
+			config.Get(config.PASSWORD),
+			config.Get(config.URL),
+			config.Get(config.DATABASE))
+		if err != nil {
+			log8j.Logger.Error("创建数据库连接失败..." + err.Error())
+		} else {
+			log8j.Logger.Info("创建数据库连接成功...")
+			saveWeather()
+			saveWeatherDetail()
+			//一小时获取一次
+			ticker := time.NewTicker(time.Hour * 1)
+			go func() {
+				for _ = range ticker.C {
+					saveWeather()
+					saveWeatherDetail()
+				}
+			}()
+		}
 	}
 }
 
@@ -121,10 +140,9 @@ func getWeather(w http.ResponseWriter, r *http.Request) {
 		t, err := template.ParseFiles("view/weather.html")
 		checkError(err, w)
 		t.Execute(w, weatherNow)
-	}else{
+	} else {
 		w.Write([]byte("访问过于频繁"))
 	}
-
 
 }
 
@@ -149,7 +167,7 @@ func getWeatherDetail(w http.ResponseWriter, r *http.Request) {
 			weatherview := weather.NewWeatherView(weatherday)
 			t.Execute(w, weatherview)
 		}
-	}else{
+	} else {
 		w.Write([]byte("访问过于频繁"))
 	}
 
@@ -176,10 +194,73 @@ func getWeatherDetailJson(w http.ResponseWriter, r *http.Request) {
 			result := "callback(" + string(bytes) + ")"
 			w.Write([]byte(result))
 		}
-	}else{
+	} else {
 		w.Write([]byte("访问过于频繁"))
 	}
 
+}
+
+func getWeatherJson(w http.ResponseWriter, r *http.Request) {
+	if myredis.IsAccess(getIP(r.RemoteAddr)) {
+		cityname := r.FormValue("cityname")
+		if len(cityname) <= 0 {
+			w.Write([]byte("cityname不能为空"))
+		}
+		log8j.Logger.Info(r.RemoteAddr + " 获取天气信息:" + cityname)
+		code, err := database.QueryCodeByCity(cityname)
+		if err != nil {
+			log8j.Logger.Error(err.Error())
+			w.Write([]byte("城市名称有误或不支持该城市"))
+		} else {
+			weatherday, err := database.QueryNewestWeatherDetail("t" + code)
+			checkError(err, w)
+			weatherview := weather.NewWeatherView(weatherday)
+			bytes, err := json.Marshal(weatherview)
+			checkError(err, w)
+			w.Write([]byte(bytes))
+		}
+	} else {
+		w.Write([]byte("访问过于频繁"))
+	}
+}
+
+func getTodayWeather(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("view/cityweather.html")
+	checkError(err, w)
+	t.Execute(w, nil)
+}
+
+func getProvince(w http.ResponseWriter, r *http.Request) {
+	provinces:=myredis.GetValue("provinces")
+	if provinces!="" {
+		w.Write([]byte(provinces))
+	} else {
+		list, err := database.QueryProvince()
+		checkError(err, w)
+		bytes, err := json.Marshal(list)
+		checkError(err, w)
+		myredis.PutKeyValue("provinces", bytes, time.Hour*12)
+		w.Write(bytes)
+	}
+
+}
+
+func getCity(w http.ResponseWriter, r *http.Request) {
+	pid := r.FormValue("pid")
+	if len(pid) <= 0 {
+		w.Write([]byte("pid不能为空"))
+	}
+	citys:=myredis.GetValue("provinceid:" + pid)
+	if citys != "" {
+		w.Write([]byte(citys))
+	} else {
+		clist, err := database.QueryCity(pid)
+		checkError(err, w)
+		cbytes, err := json.Marshal(clist)
+		checkError(err, w)
+		myredis.PutKeyValue("provinceid:" + pid, cbytes, time.Minute*1)
+		w.Write(cbytes)
+	}
 }
 
 func checkError(err error, w http.ResponseWriter) {
@@ -197,5 +278,4 @@ func getIP(addr string) string {
 
 func main() {
 	startHttpServer()
-
 }

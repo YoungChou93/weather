@@ -35,10 +35,12 @@ A small program about the weather<br>
 获取当天实时天气信息,返回json格式数据，可以使用参数cityname，例如/jsonp?cityname=北京(方便跨域调用)
 * /<br>
 获取当天实时天气信息,返回html,同样可以使用参数cityname
+* /todayweather<br>
+制作了一个方便查看天气的页面
 
 ## 实例
 
-[实例地址](http://120.24.64.3)
+[实例地址](http://120.24.64.3/todayweather)
 
 ## 联系
 

@@ -193,4 +193,59 @@ func QueryNewestWeatherDetail(table string)(weather.WeatherDetail,error) {
 	return weatherNew,nil
 }
 
+func QueryProvince() ([]weather.Province,error){
+	rows, err := db.Query("SELECT * FROM province ORDER BY id")
+	plist:=make([]weather.Province,34)
+	i:=0
+	defer rows.Close()
+	if err != nil {
+		return plist, err
+	}
+	columns, _ := rows.Columns()
+	scanArgs := make([]interface{}, len(columns))
+	values := make([]interface{}, len(columns))
+	for j := range values {
+		scanArgs[j] = &values[j]
+	}
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		record := make(map[string]string)
+		for i, col := range values {
+			if col != nil {
+				record[columns[i]] = string(col.([]byte))
+			}
+		}
+		provinceNew:=weather.Province{record[columns[0]],record[columns[1]]}
+		plist[i]=provinceNew
+		i++
+	}
+	return plist,nil
+}
+
+func QueryCity(provinceid string) ([]weather.City,error){
+	rows, err := db.Query("SELECT id,name FROM city where provinceid = "+ provinceid +" ORDER BY id")
+	clist:=make([]weather.City,0)
+	defer rows.Close()
+	if err != nil {
+		return clist, err
+	}
+	columns, _ := rows.Columns()
+	scanArgs := make([]interface{}, len(columns))
+	values := make([]interface{}, len(columns))
+	for j := range values {
+		scanArgs[j] = &values[j]
+	}
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		record := make(map[string]string)
+		for i, col := range values {
+			if col != nil {
+				record[columns[i]] = string(col.([]byte))
+			}
+		}
+		cityNew:=weather.City{record[columns[0]],record[columns[1]]}
+		clist=append(clist,cityNew)
+	}
+	return clist,nil
+}
 

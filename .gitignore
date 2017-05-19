@@ -2,7 +2,6 @@
 .idea
 
 #ignore some static resource
-static
 
 #ignore test
 test*.go
