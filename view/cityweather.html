@@ -83,10 +83,12 @@
             }, function (result) {
                 if (null != result) {
                     $("#weather").empty();
-                    var weatherStr = "<div style='height:200px;width:30%;float:left;padding-top:50px;' class='text-center'><img src='/static/img/"+result.Image+"' alt='图标'/></div>"
+                    var weatherStr =
+                        "<div class='panel panel-default text-center' style='height:220px;width:30%;float:left;padding-top:40px;background-color:aliceblue'><div class='panel-body'>"
+                        + "<img src='/static/img/"+result.Image+"' alt='图标'/><h3 style='font-size: 20px;font-family: 微软雅黑;color:#333333;'>"+result.Currentweather+"</h3></div></div>"
                     + "<h2>实时：&nbsp;"+result.Currenttemp+"℃"+"&nbsp;&nbsp;"+result.Currentweather+"&nbsp;&nbsp;"+result.Time+"</h2>"
-                        +"<p style='margin-top: 25px;'>AQI:"+result.Aqipm25+"</p>"
-                    +"<p style='margin-top: 25px;'>全天：&nbsp;"+result.Temp+"/"+result.Tempn+"&nbsp;"+result.Weather+"</p>"
+                        +"<p style='margin-top: 20px;color:#ffcc00'>AQI:"+result.Aqipm25+"</p>"
+                    +"<p style='margin-top: 30px;'>全天：&nbsp;"+result.Temp+"/"+result.Tempn+"&nbsp;"+result.Weather+"</p>"
                     +"<p>"+result.Wd+"&nbsp;"+result.Ws+"</p><p>"+result.Date+"</p>";
                     $("#weather").append(weatherStr)
 
@@ -117,7 +119,7 @@
 </script>
 <body>
 
-    <div style="position:relative;top:45%;left:50%;width:500px;height:300px;margin-left:-250px;margin-top:-150px;background-color: #2aabd2;padding:10px;">
+    <div style="position:relative;top:45%;left:50%;width:510px;height:310px;margin-left:-250px;margin-top:-150px;background-color: #2aabd2;padding:15px;">
         <div class="form-inline">
                 <select id="provinces" class="form-control">
                 </select>
